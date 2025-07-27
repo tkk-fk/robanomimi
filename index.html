@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <title>ロバの耳</title>
+  <style>
+    body {
+      font-family: "Hiragino Kaku Gothic ProN", sans-serif;
+      background-color: #f2efe6;
+      padding: 30px;
+      text-align: center;
+    }
+
+    h1 {
+      color: #5e5e5e;
+    }
+
+    #inputArea {
+      margin-bottom: 20px;
+    }
+
+    input[type="text"] {
+      width: 70%;
+      padding: 10px;
+      font-size: 1em;
+      border-radius: 6px;
+      border: 1px solid #aaa;
+    }
+
+    button {
+      padding: 10px 16px;
+      font-size: 1em;
+      margin: 5px;
+      border: none;
+      border-radius: 6px;
+      background-color: #a3d2ca;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background-color: #78c6b3;
+    }
+
+    .deleteBtn {
+      background-color: #f28b82;
+      color: white;
+      border: none;
+      padding: 6px 10px;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+
+    .deleteBtn:hover {
+      background-color: #e06666;
+    }
+
+    .井戸 {
+      border: 5px solid #7d7d7d;
+      background-color: #fefefe;
+      width: 90%;
+      margin: 0 auto;
+      border-radius: 10px;
+      box-shadow: inset 0 0 20px rgba(0,0,0,0.2);
+      padding: 10px;
+      transition: transform 0.3s;
+    }
+
+    /* 井戸爆発アニメーション */
+    @keyframes explode {
+      0%   { transform: scale(1) rotate(0deg); opacity: 1; }
+      30%  { transform: scale(1.2) rotate(10deg); }
+      50%  { transform: scale(0.8) rotate(-10deg); }
+      70%  { transform: scale(1.5) rotate(0deg); opacity: 0.6; }
+      100% { transform: scale(0) rotate(720deg); opacity: 0; }
+    }
+
+    .井戸爆発 {
+      animation: explode 1s ease-in-out forwards;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    th, td {
+      padding: 12px;
+      border-bottom: 1px solid #ccc;
+      text-align: left;
+    }
+
+    th {
+      background-color: #dcdcdc;
+    }
+
+    #status {
+      margin-top: 15px;
+      color: #a33;
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body>
+  <h1>ロバの耳</h1>
+  <p>
+    本音をすべて書きだそう。
+    <button onclick="destroyWell()">井戸完全破壊</button>
+  </p>
+  <div id="inputArea">
+    <input type="text" id="memoInput" placeholder="ここに、本音を書いてください（＋で追加）" />
+    <button onclick="addMemoFromInput()">＋</button>
+  </div>
+  <div class="井戸" id="井戸ボックス">
+    <table>
+      <thead>
+        <tr>
+          <th>No.</th>
+          <th>本音</th>
+          <th>削除</th>
+        </tr>
+      </thead>
+      <tbody id="memoTableBody"></tbody>
+    </table>
+  </div>
+  <p id="status"></p>
+
+  <script>
+    let memos = [];
+
+    function saveMemos() {
+      localStorage.setItem('memos_roba', JSON.stringify(memos));
+    }
+
+    function loadMemos() {
+      const stored = localStorage.getItem('memos_roba');
+      if (stored) {
+        memos = JSON.parse(stored);
+        renderTable();
+      }
+    }
+
+    function addMemoFromInput() {
+      const input = document.getElementById("memoInput");
+      const text = input.value.trim();
+      if (text === "") return;
+      memos.push(text);
+      input.value = "";
+      saveMemos();
+      renderTable();
+    }
+
+    function renderTable() {
+      const tbody = document.getElementById("memoTableBody");
+      tbody.innerHTML = "";
+      memos.forEach((text, index) => {
+        const row = document.createElement("tr");
+        row.innerHTML = `
+          <td>${index + 1}</td>
+          <td style="white-space: pre-wrap;">${text}</td>
+          <td><button class="deleteBtn" onclick="deleteMemo(${index})">削除</button></td>
+        `;
+        tbody.appendChild(row);
+      });
+    }
+
+    function deleteMemo(index) {
+      memos.splice(index, 1);
+      saveMemos();
+      renderTable();
+    }
+
+    function destroyWell() {
+      if (confirm("本当にすべての本音を削除しますか？")) {
+        const well = document.getElementById("井戸ボックス");
+        well.classList.add("井戸爆発");
+
+        setTimeout(() => {
+          memos = [];
+          saveMemos();
+          renderTable();
+          well.classList.remove("井戸爆発");
+          document.getElementById("status").textContent = "あなたの本音は完全に消去されました！";
+        }, 1000);
+      }
+    }
+
+    window.onload = loadMemos;
+  </script>
+</body>
+</html>
