@@ -2,6 +2,7 @@
 <html lang="ja">
 <head>
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>ロバの耳</title>
   <style>
     body {
@@ -65,7 +66,6 @@
       transition: transform 0.3s;
     }
 
-    /* 井戸爆発アニメーション */
     @keyframes explode {
       0%   { transform: scale(1) rotate(0deg); opacity: 1; }
       30%  { transform: scale(1.2) rotate(10deg); }
@@ -95,8 +95,42 @@
 
     #status {
       margin-top: 15px;
-      color: #a33;
+      color: #5c5c5c;
       font-weight: bold;
+    }
+
+    @media (max-width: 600px) {
+      input[type="text"] {
+        width: 95%;
+        font-size: 1.2em;
+      }
+
+      button {
+        font-size: 1.2em;
+        padding: 12px 20px;
+        margin: 8px;
+      }
+
+      .井戸 {
+        width: 100%;
+        padding: 5px;
+      }
+
+      table {
+        font-size: 0.95em;
+      }
+
+      th, td {
+        padding: 8px;
+      }
+
+      h1 {
+        font-size: 1.4em;
+      }
+
+      #status {
+        font-size: 1em;
+      }
     }
   </style>
 </head>
@@ -122,10 +156,11 @@
       <tbody id="memoTableBody"></tbody>
     </table>
   </div>
-  <p id="status"></p>
+  <p id="status">本音をすべて書いたら上の「井戸完全破壊」ボタンを押しましょう。</p>
 
   <script>
     let memos = [];
+    const defaultStatus = "本音をすべて書いたら上の「井戸完全破壊」ボタンを押しましょう。";
 
     function saveMemos() {
       localStorage.setItem('memos_roba', JSON.stringify(memos));
@@ -183,6 +218,14 @@
         }, 1000);
       }
     }
+
+    // 入力開始時にステータスを初期状態に戻す
+    document.getElementById("memoInput").addEventListener("input", () => {
+      const status = document.getElementById("status");
+      if (status.textContent !== defaultStatus) {
+        status.textContent = defaultStatus;
+      }
+    });
 
     window.onload = loadMemos;
   </script>
